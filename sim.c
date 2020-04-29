@@ -15,11 +15,12 @@ extern void asm_doRow(belem *, belem *, belem *, uint32_t);
  */
 static void doRow(belem *dest, belem *srcStart, belem * srcEnd, uint32_t cols){
   // TODO: 
-  while (srcStart != (srcEnd + 1)) {
+  while (srcStart <= srcEnd) {
     int numAlive = 0;
+    int columns = cols;
     for (int i = -1; i <= 1; i++) {
       for (int j = -1; j <= 1; j++) {
-        numAlive += *(srcStart + (i*cols + j));
+        numAlive += *(srcStart + (i*columns + j));
       }
     }
 
@@ -53,18 +54,21 @@ static void doRow(belem *dest, belem *srcStart, belem * srcEnd, uint32_t cols){
  */
 void simLoop(boards_t *self, uint32_t steps){
   // TODO:
-  for (int k = 0; k < steps; k++) {
+  int numStep = steps;
+  for (int k = 0; k < numStep; k++) {
+    int numberRows = self->numRows;
+    int numberColumns = self->numCols;
+
 
     belem *dest, *srcStart, *srcEnd;  
     srcStart = self->currentBuffer + (self->numCols) + 1;
-    srcEnd = srcStart + (self->numCols) - 3;
+    srcEnd = srcStart + numberColumns - 3;
     dest = self->nextBuffer + (self->numCols) + 1;
 
-    for (int i = 0; i < ((self->numRows) - 3); i++) {
-        int j = self->numCols;
-        dest = dest + j;
-        srcStart = srcStart + j;
-        srcEnd = srcEnd + j;
+    for (int i = 0; i < (numberRows - 2); i++) {
+        dest = dest + numberColumns;
+        srcStart = srcStart + numberColumns;
+        srcEnd = srcEnd + numberColumns;
         doRow(&dest, &srcStart, &srcEnd, self->numCols);
     }
 
