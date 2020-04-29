@@ -42,6 +42,7 @@ boards_t * createBoard(char *initFileName){
   fscanf(myFile, "%d", &nCol);
 
   if (nRow < 2 || nCol < 2) {
+    fclose(myFile);
     return NULL;
   }
 
@@ -72,7 +73,7 @@ boards_t * createBoard(char *initFileName){
   }
 
   newBoard->gen = 0;
-
+  fclose(myFile);
   return newBoard;
 
 }
@@ -84,6 +85,10 @@ boards_t * createBoard(char *initFileName){
  */
 void deleteBoard(boards_t **bptrPtr){
   // TODO:
+  free((*bptrPtr)->bufferA);
+  (*bptrPtr)->bufferA = NULL;
+  free((*bptrPtr)->bufferB);
+  (*bptrPtr)->bufferB = NULL;
   free(*bptrPtr);
   (*bptrPtr) = NULL;
 }

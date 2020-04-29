@@ -25,13 +25,13 @@ static void doRow(belem *dest, belem *srcStart, belem * srcEnd, uint32_t cols){
 
     numAlive -= *srcStart;
 
-    if(*srcStart == 1 && numAlive < 2) {
+    if ((*srcStart == 1) && (numAlive < 2)) {
       *dest = 0;
     }
-    else if(*srcStart == 1 && numAlive > 3) {
+    else if ((*srcStart == 1) && (numAlive > 3)) {
       *dest = 0;
     }
-    else if(*srcStart == 0 && numAlive == 3) {
+    else if ((*srcStart == 0) && (numAlive == 3)) {
       *dest = 1;
     }
     else {
@@ -57,12 +57,15 @@ void simLoop(boards_t *self, uint32_t steps){
 
     belem *dest, *srcStart, *srcEnd;  
     srcStart = self->currentBuffer + (self->numCols) + 1;
-    srcEnd = srcStart + self->numCols - 2;
+    srcEnd = srcStart + (self->numCols) - 3;
     dest = self->nextBuffer + (self->numCols) + 1;
 
     for (int i = 0; i < ((self->numRows) - 3); i++) {
-        int j = (self->numCols)*i;
-        doRow(dest + j, srcStart + j, srcEnd + j, self->numCols);
+        int j = self->numCols;
+        dest = dest + j;
+        srcStart = srcStart + j;
+        srcEnd = srcEnd + j;
+        doRow(&dest, &srcStart, &srcEnd, self->numCols);
     }
 
     swapBuffers(self);
