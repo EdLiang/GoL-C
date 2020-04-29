@@ -31,15 +31,50 @@
 boards_t * createBoard(char *initFileName){
   // TODO: 
   boards_t* newBoard = malloc(sizeof(boards_t));
-  newBoard->gen = 0;
 
-  FILE *myFile = fopen(initFileName);
+  FILE *myFile = fopen(initFileName, "r");
   if (myFile == NULL) {
     return NULL;
   }
 
-  fscanf(myFile, newBoard->numRows);
-  fscanf(myFile, newBoard->numRows);
+  int nRow, nCol;
+  fscanf(myFile, "%d", &nRow);
+  fscanf(myFile, "%d", &nCol);
+
+  if (nRow < 2 || nCol < 2) {
+    return NULL;
+  }
+
+  newBoard->numRows = nRow;
+  newBoard->numCols = nCol;
+
+  newBoard->bufferA = malloc((newBoard->numCols)*(newBoard->numRows) * sizeof(belem));
+  newBoard->bufferB = malloc((newBoard->numCols)*(newBoard->numRows) * sizeof(belem));
+
+  newBoard->currentBuffer = newBoard->bufferA;
+  newBoard->nextBuffer = newBoard->bufferB;
+
+  clearBoards(newBoard);
+
+  int readRow, readCol;
+  while(fscanf(myFile, "%d %d", &readRow, &readCol) > 0) {
+    newBoard->currentBuffer[getIndex(newBoard, readRow, readCol)] = 1;
+  }
+
+  for (int i = 0; i < newBoard->numRows; i++) {
+    for (int j = 0; j < newBoard->numCols; j++) {
+      if (i == 0 || i == (newBoard->numCols - 1) || j == 0 || j == (newBoard->numRows - 1))
+      {
+        newBoard->currentBuffer[getIndex(newBoard, i, j)] = 0;
+        newBoard->nextBuffer[getIndex(newBoard, i, j)] = 0;
+      }
+    }
+  }
+
+  newBoard->gen = 0;
+
+  return newBoard;
+
 }
 
 
@@ -49,6 +84,8 @@ boards_t * createBoard(char *initFileName){
  */
 void deleteBoard(boards_t **bptrPtr){
   // TODO:
+  free(*bptrPtr);
+  (*bptrPtr) = NULL;
 }
 
 /**
@@ -56,6 +93,10 @@ void deleteBoard(boards_t **bptrPtr){
  */
 void clearBoards(boards_t *self){
   // TODO:
+  for (int i = 0; i < (self->numCols)*(self->numRows); i++) {
+    self->currentBuffer[i] = 0;
+    self->nextBuffer[i] = 0;
+  }
 }
 
 /**
@@ -63,6 +104,10 @@ void clearBoards(boards_t *self){
  */
 void swapBuffers(boards_t *self){
   // TODO:
+  belem *tempBuffer = self->currentBuffer;
+  self->currentBuffer = self->nextBuffer;
+  self->nextBuffer = tempBuffer;
+  tempBuffer = NULL;
 }
 
 
@@ -71,5 +116,7 @@ void swapBuffers(boards_t *self){
  */
 int getIndex(boards_t *self, int row, int col){
   // TODO:
+  int index;
+  index = (row*(self->numCols)) + col;
+  return index;
 }
-  
